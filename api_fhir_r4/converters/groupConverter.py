@@ -354,7 +354,7 @@ class GroupConverter(BaseFHIRConverter, ReferenceConverterMixin):
         reference = PatientConverter.build_fhir_resource_reference(
             insuree,
             type='Patient',
-            display=insuree.chf_id
+            display=str(insuree.insure.chf_id)
         )
         return GroupMember(entity=reference)
 

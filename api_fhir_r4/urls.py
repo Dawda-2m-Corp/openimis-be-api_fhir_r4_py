@@ -36,7 +36,6 @@ if 'location' in imis_modules:
 # register endpoint for insuree if used
 if 'insuree' in imis_modules:
     router.register(r'Patient', fhir_viewsets.InsureeViewSet, basename="Patient_R4")
-    router.register(r'Group', fhir_viewsets.GroupViewSet, basename="Group_R4")
     router.register(
         r'CoverageEligibilityRequest', fhir_viewsets.CoverageEligibilityRequestViewSet,
         basename="CoverageEligibilityRequest_R4"
@@ -101,6 +100,7 @@ if 'policy' in imis_modules:
 # register endpoint for policy holder if used
 if 'policyholder' in imis_modules:
     router.register(r'Organization', fhir_viewsets.OrganisationViewSet, basename="Organisation_R4")
+    router.register(r'Group', fhir_viewsets.GroupViewSet2, basename="Group_R4")
     router.register(r'CodeSystem/organization-ph-legal-form', fhir_viewsets.CodeSystemOrganizationPHLegalFormViewSet,
                     basename="CodeSystem/organization-ph-legal-form_R4")
     router.register(r'CodeSystem/organization-ph-activity', fhir_viewsets.CodeSystemOrganizationPHActivityViewSet,
@@ -109,13 +109,6 @@ if 'policyholder' in imis_modules:
 if 'invoice' in imis_modules:
     router.register(r'Invoice', fhir_viewsets.InvoiceViewSet, basename="Invoice_R4")
     router.register(r'PaymentNotice', fhir_viewsets.PaymentNoticeViewSet, basename="PaymentNotice_R4")
-
-# if 'policyholder' in imis_modules:
-#     router.register(r'Organization2', fhir_viewsets.OrganisationViewSet2, basename="Organisation_R4")
-#     router.register(r'CodeSystem/organization-ph-legal-form', fhir_viewsets.CodeSystemOrganizationPHLegalFormViewSet,
-#                     basename="CodeSystem/organization-ph-legal-form_R4")
-#     router.register(r'CodeSystem/organization-ph-activity', fhir_viewsets.CodeSystemOrganizationPHActivityViewSet,
-#                     basename="CodeSystem/organization-ph-activity_R4")
 
 urlpatterns = [
     path('', include(router.urls)),

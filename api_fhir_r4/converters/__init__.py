@@ -290,3 +290,4 @@ from api_fhir_r4.converters.enrolmentOfficerPractitionerRoleConverter import Enr
 from api_fhir_r4.converters.communicationConverter import CommunicationConverter
 from api_fhir_r4.converters.coverageConverter import CoverageConverter
 from api_fhir_r4.converters.invoiceConverter import InvoiceConverter, BillInvoiceConverter
+from api_fhir_r4.converters.groupConverter_policyholder import GroupConverterPolicyHolder
