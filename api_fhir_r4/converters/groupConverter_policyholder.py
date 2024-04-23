@@ -115,7 +115,7 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_quantity(cls,fhir_policy_holder, imis_policy_holder):
-        quantity = PolicyHolderInsuree.objects.filter(policy_holder__uuid=imis_policy_holder.uuid, is_deleted=True).count()
+        quantity = PolicyHolderInsuree.objects.filter(policy_holder__uuid=imis_policy_holder.uuid, is_deleted=False).count()
         fhir_policy_holder.quantity = quantity
 
     @classmethod
@@ -159,7 +159,7 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
         'insuree_bundle_detail': bundle_details  
     }
 
-        display_str = json.dumps(insuree_details, indent=4,)
+        display_str = json.dumps(insuree_details, indent=4)
 
         
 
