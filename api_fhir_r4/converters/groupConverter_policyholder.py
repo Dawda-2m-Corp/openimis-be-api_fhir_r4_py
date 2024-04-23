@@ -1,3 +1,4 @@
+import json
 from django.db.models.query import Q
 from django.utils.translation import gettext as _
 from fhir.resources.R4B.humanname import HumanName
@@ -131,14 +132,42 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def create_group_members(cls,insure_relation):
         from api_fhir_r4.converters import PatientConverter
+
+        bundle_details = []
+
+        policy_holder_insurees = PolicyHolderInsuree.objects.filter(insuree=insure_relation.insuree, is_deleted=False)
+
+    # Loop through each related PolicyHolderInsuree instance to gather contribution plan bundles and calculation rules
+        for policy_holder_insuree in policy_holder_insurees:
+            contribution_plan_bundle = policy_holder_insuree.contribution_plan_bundle.code
+            calculation_rule = policy_holder_insuree.json_ext.get('calculation_rule')  # Extract calculation rule from JSON field
+
+            # Create a dictionary for each contribution plan bundle and calculation rule pair
+            bundle_detail = {
+                "contribution_plan_bundle": str(contribution_plan_bundle),
+                "calculation_rule": calculation_rule
+            }
+        
+        bundle_details.append(bundle_detail)
+
+        insuree_details = {
+        "name": insure_relation.insuree.last_name,
+        "last_name": insure_relation.insuree.other_names,
+        "chf_id": insure_relation.insuree.chf_id,
+        'address': insure_relation.insuree.current_address or None,
+        'email': insure_relation.insuree.email or None,
+        'insuree_bundle_detail': bundle_details  
+    }
+
+        display_str = json.dumps(insuree_details, indent=4,)
+
+        
+
         reference = PatientConverter.build_fhir_resource_reference(
             insure_relation,
             type= 'Patient',
-            display=str({
-                "name":str(insure_relation.insuree), 
-                'chf_id':str(insure_relation.insuree.chf_id),  
-                'address':insure_relation.insuree.current_address,  
-                'email':str(insure_relation.insuree.email)})
+            display=display_str
+
         )
         return GroupMember(entity=reference)
 
