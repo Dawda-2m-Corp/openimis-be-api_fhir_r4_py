@@ -5,7 +5,7 @@ from api_fhir_r4.converters import GroupConverter
 from api_fhir_r4.exceptions import FHIRException
 from api_fhir_r4.serializers import BaseFHIRSerializer
 from insuree.services import FamilyService, InsureeService
-from core.models import resolve_id_reference
+# from core.models import resolve_id_reference
 
 from django.forms.models import model_to_dict
 
