@@ -34,6 +34,16 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_name(fhir_policy_holder, imis_policy_holder)
         cls.build_fhir_member(fhir_policy_holder, imis_policy_holder, reference_type)
         return fhir_policy_holder
+    
+    def to_imis_fhir(cls, fhir_policy_holder_insuree):
+        errors = []
+        fhir_policy_holder_insuree = Group(**fhir_policy_holder_insuree)
+        imis_policy_holder_insuree = PolicyHolderInsuree()
+        cls.build_policy_holder_members(imis_policy_holder_insuree, fhir_policy_holder_insuree)
+        cls.check_errors(errors)
+        return imis_policy_holder_insuree
+
+
 
    
     @classmethod
@@ -159,15 +169,22 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
         'insuree_bundle_detail': bundle_details  
     }
 
-        display_str = json.dumps(insuree_details, indent=4)
+        display_str = json.dumps(insuree_details,indent=4)
+
+        # display_formated_str = json.dumps(display_str, indent=4)
 
         
 
         reference = PatientConverter.build_fhir_resource_reference(
-            insure_relation,
+            insure_relation.insuree,
             type= 'Patient',
             display=display_str
 
         )
         return GroupMember(entity=reference)
+    
+    @classmethod
+    def build_policy_holder_members(cls , imis_policy_holder_insuree, fhir_policy_holder_insuree):
+
+        pass
 
