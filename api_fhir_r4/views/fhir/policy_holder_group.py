@@ -2,7 +2,7 @@ from rest_framework import viewsets
 
 from api_fhir_r4.mixins import MultiIdentifierRetrieverMixin, MultiIdentifierUpdateMixin
 from api_fhir_r4.model_retrievers import UUIDIdentifierModelRetriever, GroupIdentifierModelRetriever
-from api_fhir_r4.permissions import FHIRApiGroupPermissions
+from api_fhir_r4.permissions import FHIRApiGroupPermissions, IsPolicyHolderUser
 from policyholder.models import PolicyHolder
 from api_fhir_r4.serializers import PolicyHolderGroupSerializer
 from api_fhir_r4.views.fhir.base import BaseFHIRView
@@ -14,7 +14,7 @@ class GroupViewSet2(BaseFHIRView, MultiIdentifierRetrieverMixin,
                    MultiIdentifierUpdateMixin, viewsets.ModelViewSet):
     retrievers = [UUIDIdentifierModelRetriever, GroupIdentifierModelRetriever]
     serializer_class = PolicyHolderGroupSerializer
-    permission_classes = (FHIRApiGroupPermissions,)
+    permission_classes = (IsPolicyHolderUser,)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

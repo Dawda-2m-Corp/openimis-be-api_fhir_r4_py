@@ -9,7 +9,7 @@ from product.apps import ProductConfig
 from medical.apps import MedicalConfig
 from invoice.apps import InvoiceConfig
 from rest_framework import exceptions
-from rest_framework.permissions import DjangoModelPermissions
+from rest_framework.permissions import DjangoModelPermissions,BasePermission
 
 
 class FHIRApiPermissions(DjangoModelPermissions):
@@ -18,6 +18,9 @@ class FHIRApiPermissions(DjangoModelPermissions):
     permissions_put = []
     permissions_patch = []
     permissions_delete = []
+
+
+
 
     def __init__(self):
         self.perms_map['GET'] = self.permissions_get
@@ -191,3 +194,22 @@ class FHIRApiSubscriptionPermissions(FHIRApiPermissions):
     permissions_put = R4SubscriptionConfig.get_fhir_sub_update_perms()
     permissions_patch = R4SubscriptionConfig.get_fhir_sub_update_perms()
     permissions_delete = R4SubscriptionConfig.get_fhir_sub_delete_perms()
+
+class IsPolicyHolderUser(BasePermission):
+    """
+    Custom permission to only allow policy holder users to access their own organization's insurees.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Check if the user making the request is a policy holder user
+        if hasattr(request.user, 'policyholderuser'):
+            print(True)
+            # Get the policy holder user associated with the requesting user
+            policy_holder_user = request.user.policyholderuser
+            
+            # Check if the policy holder user is associated with the policy holder of the insuree
+            # Compare the policy holder of the insuree with the policy holder of the requesting user
+            return policy_holder_user.policy_holder == obj.policy_holder
+        
+        # Default to deny access if the user is not a policy holder user
+        return False

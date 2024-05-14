@@ -14,6 +14,7 @@ from api_fhir_r4.converters.locationConverter import LocationConverter
 from api_fhir_r4.mapping.groupMapping import GroupTypeMapping, ConfirmationTypeMapping
 from fhir.resources.R4B.extension import Extension
 from fhir.resources.R4B.group import Group, GroupMember
+
 from api_fhir_r4.utils import DbManagerUtils
 from api_fhir_r4.exceptions import FHIRException
 
@@ -139,49 +140,62 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
         return insures
 
 
-    @classmethod
-    def create_group_members(cls,insure_relation):
-        from api_fhir_r4.converters import PatientConverter
+    
 
+    @classmethod
+    def create_group_members(cls, insure_relation):
         bundle_details = []
 
         policy_holder_insurees = PolicyHolderInsuree.objects.filter(insuree=insure_relation.insuree, is_deleted=False)
 
-    # Loop through each related PolicyHolderInsuree instance to gather contribution plan bundles and calculation rules
+        # Loop through each related PolicyHolderInsuree instance to gather contribution plan bundles and calculation rules
         for policy_holder_insuree in policy_holder_insurees:
             contribution_plan_bundle = policy_holder_insuree.contribution_plan_bundle.code
-            calculation_rule = policy_holder_insuree.json_ext.get('calculation_rule')  # Extract calculation rule from JSON field
+            calculation_rule = policy_holder_insuree.json_ext.get('calculation_rule')
 
             # Create a dictionary for each contribution plan bundle and calculation rule pair
             bundle_detail = {
                 "contribution_plan_bundle": str(contribution_plan_bundle),
                 "calculation_rule": calculation_rule
             }
-        
-        bundle_details.append(bundle_detail)
+            
+            bundle_details.append(bundle_detail)
 
         insuree_details = {
-        "name": insure_relation.insuree.last_name,
-        "last_name": insure_relation.insuree.other_names,
-        "chf_id": insure_relation.insuree.chf_id,
-        'address': insure_relation.insuree.current_address or None,
-        'email': insure_relation.insuree.email or None,
-        'insuree_bundle_detail': bundle_details  
-    }
+            "name": insure_relation.insuree.last_name,
+            "last_name": insure_relation.insuree.other_names,
+            "chf_id": insure_relation.insuree.chf_id,
+            'address': insure_relation.insuree.current_address or None,
+            'email': insure_relation.insuree.email or None,
+            'insuree_bundle_detail': bundle_details 
+             
+        }
 
-        display_str = json.dumps(insuree_details,indent=4)
-
-        # display_formated_str = json.dumps(display_str, indent=4)
-
-        
-
-        reference = PatientConverter.build_fhir_resource_reference(
-            insure_relation.insuree,
-            type= 'Patient',
-            display=display_str
-
+        # Create a GroupMember instance
+        group_member = GroupMember(
+            entity={
+                "reference": f"Patient/{insure_relation.insuree.uuid}",
+                "type": "Patient",
+                "display": str(insure_relation.insuree.last_name)
+            }
         )
-        return GroupMember(entity=reference)
+
+        # Create extensions for other details
+        extensions = []
+        for key, value in insuree_details.items():
+            if key != "name":  # Exclude the name field from extensions
+                extension_url = f"http://example.com/{key}"  # Replace with appropriate extension URL
+                extension = Extension(
+                    url=extension_url,
+                    valueString=str(value ) # Convert value to JSON string
+                )
+                extensions.append(extension)
+
+        # Add extensions to the GroupMember
+        group_member.extension = extensions
+
+        return group_member
+
     
     @classmethod
     def build_policy_holder_members(cls , imis_policy_holder_insuree, fhir_policy_holder_insuree):
