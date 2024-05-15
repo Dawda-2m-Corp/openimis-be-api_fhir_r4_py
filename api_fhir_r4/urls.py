@@ -35,7 +35,6 @@ if 'location' in imis_modules:
 
 # register endpoint for insuree if used
 if 'insuree' in imis_modules:
-    router.register(r'Patient/filter/$', fhir_viewsets.InsureeFilterView, basename="InsureeFilter_R4")
     router.register(r'Patient/$',
                     fhir_viewsets.InsureeViewSet,
                     basename="Patient_R4")

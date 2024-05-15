@@ -21,7 +21,6 @@ from api_fhir_r4.views.fhir.coverage_request import CoverageRequestQuerySet
 from api_fhir_r4.views.fhir.group import GroupViewSet
 from api_fhir_r4.views.fhir.insurance_plan import ProductViewSet
 from api_fhir_r4.views.fhir.insuree import InsureeViewSet
-from api_fhir_r4.views.fhir.insuree import InsureeFilterView
 from api_fhir_r4.views.fhir.invoice import InvoiceViewSet
 from api_fhir_r4.views.fhir.location import LocationViewSet
 from api_fhir_r4.views.fhir.medication import MedicationViewSet

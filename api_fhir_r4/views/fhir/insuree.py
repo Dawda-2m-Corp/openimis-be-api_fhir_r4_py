@@ -14,7 +14,7 @@ from api_fhir_r4.views.fhir.base import BaseFHIRView
 from api_fhir_r4.views.filters import ValidityFromRequestParameterFilter
 from claim.models import Claim
 from insuree.models import Insuree
-from rest_framework.exceptions import ValidationError
+import re
 
 
 class InsureeViewSet(BaseFHIRView, MultiIdentifierRetrieverMixin,
@@ -70,30 +70,4 @@ class InsureeViewSet(BaseFHIRView, MultiIdentifierRetrieverMixin,
         # Apply additional filtering based on request parameters
         queryset = ValidityFromRequestParameterFilter(self.request).filter_queryset(queryset)
 
-        # Filter queryset based on organization parameter
-        organization_id = self.request.GET.get('organization_id')
-        if organization_id:
-            queryset = queryset.filter(uuid=organization_id)
-
         return queryset
-
-
-
-
-class InsureeFilterView(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = Insuree.objects.all()
-    serializer_class = PatientSerializer
-
-    def list(self, request, *args, **kwargs):
-        identifier = request.GET.get("identifier")
-
-        if not identifier:
-            return Response({'error': 'Identifier parameter is missing'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            instance = self.queryset.get(identifier=identifier)
-        except Insuree.DoesNotExist:
-            return Response({'error': 'Insuree not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
