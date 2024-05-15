@@ -209,8 +209,8 @@ class PolicyHolderOrganisationConverter(BaseFHIRConverter, ReferenceConverterMix
 
             # HumanName extension
             human_name = HumanName.construct()
-            human_name.given = [insuree_relation.insuree.other_names]
-            human_name.family = insuree_relation.insuree.last_name
+            human_name.given = [insuree_relation.insuree.other_names] or None
+            human_name.family = insuree_relation.insuree.last_name or None
             name_extension = Extension.construct()
             name_extension.url = "http://example.org/fhir/StructureDefinition/insuree-name"
             name_extension.valueHumanName = human_name

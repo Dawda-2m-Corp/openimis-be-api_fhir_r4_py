@@ -90,7 +90,7 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
     def _validate_imis_identifier_code(cls, imis_policy_holder):
         if not imis_policy_holder.code:
             raise FHIRException(
-                _('Policy %(imis_policy_code)s without code') % {'family_uuid': imis_policy_holder.uuid}
+                _('Policy %(imis_policy_code)s without code') % {'policy_uuid': imis_policy_holder.uuid}
             )
    
 
