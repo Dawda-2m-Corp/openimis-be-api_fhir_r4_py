@@ -203,12 +203,11 @@ class IsPolicyHolderUser(BasePermission):
     def has_object_permission(self, request, view, obj):
         # Check if the user making the request is a policy holder user
         if hasattr(request.user, 'policyholderuser'):
-            print(True)
             # Get the policy holder user associated with the requesting user
             policy_holder_user = request.user.policyholderuser
             
-            # Check if the policy holder user is associated with the policy holder of the insuree
-            # Compare the policy holder of the insuree with the policy holder of the requesting user
+            # Check if the policy holder user is associated with the policy holder of the object
+            # Compare the policy holder of the object with the policy holder of the requesting user
             return policy_holder_user.policy_holder == obj.policy_holder
         
         # Default to deny access if the user is not a policy holder user
