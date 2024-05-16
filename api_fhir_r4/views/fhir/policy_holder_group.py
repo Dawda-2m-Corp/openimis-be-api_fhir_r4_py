@@ -21,7 +21,7 @@ class GroupViewSet2(BaseFHIRView, MultiIdentifierRetrieverMixin,
 
     def get_queryset(self):
         try:
-            policy_holder_user = PolicyHolderUser.objects.get(user=self.request.user, is_deleted=False)
+            policy_holder_user = PolicyHolderUser.objects.filter(user=self.request.user, is_deleted=False).first()
         except PolicyHolderUser.DoesNotExist:
             raise PermissionDenied("User does not have permission to access this resource.")
         
@@ -42,27 +42,3 @@ class GroupViewSet2(BaseFHIRView, MultiIdentifierRetrieverMixin,
 
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
-
-    # def list(self, request, *args, **kwargs):
-    #     user=request.user
-    #     policy_holder_user = PolicyHolderUser.objects.get(user=user, is_deleted=False)
-    #     queryset = self.get_queryset()
-    #     # # Get the policy holder associated with the requesting user
-       
-    #     # # Filter the queryset based on the policy holder
-    #     queryset = self.get_queryset().filter(policy_holder=policy_holder_user.uuid)
-    #     identifier = request.GET.get("identifier")
-    #     if identifier:
-    #         return self.retrieve(request, *args, **{**kwargs, 'identifier': identifier})
-    #     else:
-    #         queryset = queryset.filter(is_deleted=False)
-    #     serializer = PolicyHolderGroupSerializer(self.paginate_queryset(queryset), many=True)
-    #     return self.get_paginated_response(serializer.data)
-
-    # def retrieve(self, *args, **kwargs):
-    #     response = super().retrieve(self, *args, **kwargs)
-    #     return response
-
-    # def get_queryset(self):
-    #     queryset = PolicyHolder.objects.filter(is_deleted=False)
-    #     return DateUpdatedRequestParameterFilter(self.request).filter_queryset(queryset)
