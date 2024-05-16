@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 from fhir.resources.R4B.humanname import HumanName
 from django.db.models import Model
 from insuree.models import Insuree, InsureePolicy, Family, FamilyType, ConfirmationType
-from policyholder.models import PolicyHolderInsuree, PolicyHolder,PolicyHolderUser
+from policyholder.models import PolicyHolderInsuree, PolicyHolder, PolicyHolderUser
 from policy.models import Policy
 from location.models import Location
 from api_fhir_r4.configurations import R4IdentifierConfig, GeneralConfiguration
@@ -20,12 +20,12 @@ from api_fhir_r4.exceptions import FHIRException
 
 
 class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
-    
+
     @classmethod
-    def to_fhir_obj(cls, imis_policy_holder:PolicyHolder, reference_type=ReferenceConverterMixin.UUID_REFERENCE_TYPE):
+    def to_fhir_obj(cls, imis_policy_holder: PolicyHolder, reference_type=ReferenceConverterMixin.UUID_REFERENCE_TYPE):
 
         fhir_policy_holder = {}
-        cls.build_fhir_actual(fhir_policy_holder,imis_policy_holder)
+        cls.build_fhir_actual(fhir_policy_holder, imis_policy_holder)
         cls.build_fhir_type(fhir_policy_holder, imis_policy_holder)
         fhir_policy_holder = Group(**fhir_policy_holder)
         # cls.build_fhir_extensions(fhir_policy_holder, imis_policy_holder, reference_type)
@@ -35,7 +35,8 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
         cls.build_fhir_name(fhir_policy_holder, imis_policy_holder)
         cls.build_fhir_member(fhir_policy_holder, imis_policy_holder, reference_type)
         return fhir_policy_holder
-    
+
+    @classmethod
     def to_imis_fhir(cls, fhir_policy_holder_insuree):
         errors = []
         fhir_policy_holder_insuree = Group(**fhir_policy_holder_insuree)
@@ -46,7 +47,7 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
 
 
 
-   
+
     @classmethod
     def build_fhir_actual(cls, fhir_policy_holder, imis_policy_holder):
         fhir_policy_holder['actual'] = True
@@ -59,23 +60,23 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
     @classmethod
     def build_fhir_identifiers(cls, fhir_policy_holder, imis_policy_holder):
         identifiers = []
-        cls.build_all_identifiers( identifiers, imis_policy_holder)
+        cls.build_all_identifiers(identifiers, imis_policy_holder)
         fhir_policy_holder.identifier = identifiers
-    
-    
+
+
     @classmethod
-    def get_reference_obj_id(cls, imis_policy_holder:PolicyHolder):
+    def get_reference_obj_id(cls, imis_policy_holder: PolicyHolder):
         return imis_policy_holder.id
 
     @classmethod
-    def get_reference_obj_uuid(cls, imis_policy_holder:PolicyHolder):
+    def get_reference_obj_uuid(cls, imis_policy_holder: PolicyHolder):
         return imis_policy_holder.uuid
 
     @classmethod
     def get_reference_obj_code(cls, obj):
         return obj.code
 
-    
+
     @classmethod
     def _build_policy_holder_identifier(cls, identifiers, imis_policy_holder):
         cls._validate_imis_identifier_code(imis_policy_holder)
@@ -92,26 +93,27 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
             raise FHIRException(
                 _('Policy %(imis_policy_code)s without code') % {'policy_uuid': imis_policy_holder.uuid}
             )
-   
+
 
     @classmethod
     def get_fhir_code_identifier_type(cls):
         return R4IdentifierConfig.get_fhir_generic_type_code()
+
     @classmethod
     def get_reference_obj_id(cls, imis_policy_holder):
         return imis_policy_holder.id
-    
+
     @classmethod
     def get_fhir_resource_type(cls):
         return Group
 
-    # @classmethod
-    # def build_fhir_pk(cls, fhir_obj, resource, reference_type: str = None):
-    #     if reference_type == ReferenceConverterMixin.CODE_REFERENCE_TYPE:
-    #       fhir_obj.id = resource.code
-    #     else:
-    #       return super().build_fhir_pk(fhir_obj, resource, reference_type)
-    
+    @classmethod
+    def build_fhir_pk(cls, fhir_obj, resource, reference_type: str = None):
+        if reference_type == ReferenceConverterMixin.CODE_REFERENCE_TYPE:
+            fhir_obj.id = resource.code
+        else:
+            return super().build_fhir_pk(fhir_obj, resource, reference_type)
+
     @classmethod
     def get_imis_obj_by_fhir_reference(cls, reference, errors=None):
         return DbManagerUtils.get_object_or_none(
@@ -125,22 +127,23 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
 
 
     @classmethod
-    def build_fhir_quantity(cls,fhir_policy_holder, imis_policy_holder):
-        quantity = PolicyHolderInsuree.objects.filter(policy_holder__uuid=imis_policy_holder.uuid, is_deleted=False).count()
+    def build_fhir_quantity(cls, fhir_policy_holder, imis_policy_holder):
+        quantity = PolicyHolderInsuree.objects.filter(
+            policy_holder__uuid=imis_policy_holder.uuid, is_deleted=False).count()
         fhir_policy_holder.quantity = quantity
 
     @classmethod
     def build_fhir_member(cls, fhir_policy_holder, imis_policy_holder, reference_type):
-        fhir_policy_holder.member = cls.build_fhir_members(imis_policy_holder) 
+        fhir_policy_holder.member = cls.build_fhir_members(imis_policy_holder)
 
     @classmethod
-    def build_fhir_members(cls,imis_policy_holder:PolicyHolder):
+    def build_fhir_members(cls, imis_policy_holder: PolicyHolder):
         policy_holder_insuree = PolicyHolderInsuree.objects.filter(policy_holder=imis_policy_holder, is_deleted=False)
-        insures = [cls.create_group_members(insure_relation) for insure_relation in policy_holder_insuree ]
+        insures = [cls.create_group_members(insure_relation) for insure_relation in policy_holder_insuree]
         return insures
 
 
-    
+
 
     @classmethod
     def create_group_members(cls, insure_relation):
@@ -151,14 +154,14 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
         # Loop through each related PolicyHolderInsuree instance to gather contribution plan bundles and calculation rules
         for policy_holder_insuree in policy_holder_insurees:
             contribution_plan_bundle = policy_holder_insuree.contribution_plan_bundle.code
-            calculation_rule = policy_holder_insuree.json_ext.get('calculation_rule')
-
+            calculation_rule = policy_holder_insuree.json_ext.get(
+                'calculation_rule') if policy_holder_insuree.json_ext else None
             # Create a dictionary for each contribution plan bundle and calculation rule pair
             bundle_detail = {
                 "contribution_plan_bundle": str(contribution_plan_bundle),
                 "calculation_rule": calculation_rule
             }
-            
+
             bundle_details.append(bundle_detail)
 
         insuree_details = {
@@ -167,8 +170,8 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
             "chf_id": insure_relation.insuree.chf_id,
             'address': insure_relation.insuree.current_address or None,
             'email': insure_relation.insuree.email or None,
-            'insuree_bundle_detail': bundle_details 
-             
+            'insuree_bundle_detail': bundle_details
+
         }
 
         # Create a GroupMember instance
@@ -187,7 +190,7 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
                 extension_url = f"http://example.com/{key}"  # Replace with appropriate extension URL
                 extension = Extension(
                     url=extension_url,
-                    valueString=str(value ) # Convert value to JSON string
+                    valueString=str(value) # Convert value to JSON string
                 )
                 extensions.append(extension)
 
@@ -196,9 +199,8 @@ class GroupConverterPolicyHolder(BaseFHIRConverter, ReferenceConverterMixin):
 
         return group_member
 
-    
+
     @classmethod
-    def build_policy_holder_members(cls , imis_policy_holder_insuree, fhir_policy_holder_insuree):
+    def build_policy_holder_members(cls, imis_policy_holder_insuree, fhir_policy_holder_insuree):
 
         pass
-
