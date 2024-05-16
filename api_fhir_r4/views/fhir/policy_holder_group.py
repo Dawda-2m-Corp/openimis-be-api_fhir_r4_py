@@ -17,7 +17,7 @@ class GroupViewSet2(BaseFHIRView, MultiIdentifierRetrieverMixin,
                     MultiIdentifierUpdateMixin, viewsets.ModelViewSet):
     retrievers = [UUIDIdentifierModelRetriever, GroupIdentifierModelRetriever]
     serializer_class = PolicyHolderGroupSerializer
-    permission_classes = (FHIRApiGroupPermissions,
+    permission_classes = (FHIRApiGroupPermissions,)
 
     def get_queryset(self):
         try:

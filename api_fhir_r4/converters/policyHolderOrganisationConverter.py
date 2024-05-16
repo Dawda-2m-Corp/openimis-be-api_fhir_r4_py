@@ -83,7 +83,6 @@ class PolicyHolderOrganisationConverter(BaseFHIRConverter, ReferenceConverterMix
     def build_fhir_extensions(cls, fhir_organisation, imis_organisation, reference_type):
         cls.build_fhir_legal_form_extension(fhir_organisation, imis_organisation)
         cls.build_fhir_activity_extension(fhir_organisation, imis_organisation)
-        cls.build_fhir_policy_insuree_extension(fhir_organisation, imis_organisation, reference_type)
         
 
     @classmethod
@@ -195,41 +194,9 @@ class PolicyHolderOrganisationConverter(BaseFHIRConverter, ReferenceConverterMix
         fhir_organisation.contact = []
         if imis_organisation.contact_name:
             name = HumanName.construct()
-            name.text = "%s" % (imis_organisation.contact_name['contactName'])
-            fhir_organisation.contact.append({'name': name})
-    @classmethod
-    def build_fhir_policy_insuree_extension(cls, fhir_organisation, imis_organisation, reference_type):
-        insurees = PolicyHolderInsuree.objects.filter(policy_holder=imis_organisation, is_deleted=False)
-        insuree_extensions = []
+            name.text = "%s" % (imis_organisation.contact_name['contactName']) 
+            fhir_organisation.contact.append({'name': name}) 
 
-        for insuree_relation in insurees:
-            # Primary extension for the insuree
-            insuree_extension = Extension.construct()
-            insuree_extension.url = "http://example.org/fhir/StructureDefinition/policyholder-insuree-details"
-
-            # HumanName extension
-            human_name = HumanName.construct()
-            human_name.given = [insuree_relation.insuree.other_names] or None
-            human_name.family = insuree_relation.insuree.last_name or None
-            name_extension = Extension.construct()
-            name_extension.url = "http://example.org/fhir/StructureDefinition/insuree-name"
-            name_extension.valueHumanName = human_name
-
-            
-
-            
-            # Adding name and address extensions to the primary insuree extension
-            
-            # Reference to Patient
-            insuree_extension.valueReference = PatientConverter\
-                 .build_fhir_resource_reference(insuree_relation.insuree, type='Patient', display=insuree_relation.insuree.chf_id, reference_type=reference_type)
-
-            insuree_extensions.append(insuree_extension)
-            insuree_extensions.append(name_extension)
-
-        if not hasattr(fhir_organisation, 'extension') or not fhir_organisation.extension:
-            fhir_organisation.extension = []
-        fhir_organisation.extension.extend(insuree_extensions)
 
     @classmethod
     def build_imis_ph_identiftier(cls, imis_ph, fhir_ph, errors):
