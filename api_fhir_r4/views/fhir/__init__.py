@@ -30,3 +30,4 @@ from api_fhir_r4.views.fhir.practitioner_role import PractitionerRoleViewSet
 from api_fhir_r4.views.fhir.subscription import SubscriptionViewSet
 from api_fhir_r4.views.fhir.payment_notice import PaymentNoticeViewSet
 from api_fhir_r4.views.fhir.policy_holder_group import GroupViewSet2
+from api_fhir_r4.views.fhir.policy_holder_insuree import PolicyHolderInsureeViewSet
