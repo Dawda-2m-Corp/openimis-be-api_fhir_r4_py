@@ -9,14 +9,6 @@ class CustomPropertyPagination(PageNumberPagination):
     max_page_size = 10000
     page_query_param = 'page'
 
-    def paginate_list(self, data, page_number, page_size):
-        total_count = len(data)
-        start_index = (page_number - 1) * page_size
-        end_index = start_index + page_size
-        paginated_data = data[start_index:end_index]
-        total_page_number = (total_count + page_size - 1) // page_size
-        return paginated_data, total_page_number
-
     def paginate_queryset(self, queryset, request, view=None):
         self.request = request
 
@@ -29,18 +21,23 @@ class CustomPropertyPagination(PageNumberPagination):
         except ValueError:
             raise NotFound(detail="Invalid page number format.")
 
-        total_count = len(queryset)
-        print(queryset)
+        total_count = self.get_total_count(queryset)
         start_index = (self.page_number - 1) * self.page_size
         end_index = start_index + self.page_size
+
+        # Debugging statements
+        print(f"Total count: {total_count}")
+        print(f"Page number: {self.page_number}")
+        print(f"Start index: {start_index}")
+        print(f"End index: {end_index}")
 
         if start_index >= total_count or start_index < 0:
             raise NotFound(detail="Invalid page.")
 
-        paginated_data = queryset[start_index:end_index]
+        paginated_data = list(queryset[start_index:end_index])
         self.total_page_number = (total_count + self.page_size - 1) // self.page_size
 
-        return list(paginated_data)
+        return paginated_data
 
     def get_paginated_response(self, data):
         request = self.request
@@ -56,8 +53,8 @@ class CustomPropertyPagination(PageNumberPagination):
         except ValueError:
             raise NotFound(detail="Invalid page number format.")
 
-        resource_type = "Bundle"
         resource_url = request.build_absolute_uri().split('?')[0]
+        resource_type = "Bundle"
         resource_type_group = "Group"
 
         identifiers = []
@@ -109,3 +106,14 @@ class CustomPropertyPagination(PageNumberPagination):
                 "member": paginated_data
             }
         })
+
+    def paginate_list(self, data, page_number, page_size):
+        total_count = len(data)
+        start_index = (page_number - 1) * page_size
+        end_index = start_index + page_size
+        paginated_data = data[start_index:end_index]
+        total_page_number = (total_count + page_size - 1) // page_size
+        return paginated_data, total_page_number
+
+    def get_total_count(self, queryset):
+        return queryset.count()  # Or len(queryset) if count() is not available for the queryset
