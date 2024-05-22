@@ -7,7 +7,7 @@ from insuree.models import Insuree, Family
 
 from api_fhir_r4.converters import PatientConverter
 from api_fhir_r4.exceptions import FHIRException
-from api_fhir_r4.serializers.custom_patient_serializer import BaseFHIRSerializer
+from api_fhir_r4.serializers import BaseFHIRSerializer
 from insuree.services import InsureeService
 
 
