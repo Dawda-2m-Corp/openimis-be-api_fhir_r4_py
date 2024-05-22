@@ -34,7 +34,6 @@ class PolicyHolderInsureeViewSet(viewsets.ModelViewSet):
             policy_holder=policy_holder_user.policy_holder,
             is_deleted=False
         )
-        print(policy_holder_user.policy_holder)
         return policy_holder_insurees.values('insuree_id')
 
     def _filter_queryset(self, queryset):
