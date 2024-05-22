@@ -15,7 +15,7 @@ class PatientSerializer(BaseFHIRSerializer):
     fhirConverter = PatientConverter()
 
     def create(self, validated_data):
-        #validated_data = resolve_id_reference(Insuree, validated_data)
+        # validated_data = resolve_id_reference(Insuree, validated_data)
         self._validate_data(validated_data.get('chf_id'))
         copied_data = self._clean_data(copy.deepcopy(validated_data))
         obj = InsureeService(self.context.get("request").user)\
@@ -26,7 +26,7 @@ class PatientSerializer(BaseFHIRSerializer):
         return obj
 
     def update(self, instance, validated_data):
-        #validated_data = resolve_id_reference(Insuree, validated_data)
+        # validated_data = resolve_id_reference(Insuree, validated_data)
         request = self.context.get("request")
         validated_data.pop('_state')
         user = request.user

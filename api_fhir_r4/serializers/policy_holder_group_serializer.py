@@ -7,5 +7,3 @@ from api_fhir_r4.serializers import BaseFHIRSerializer
 class PolicyHolderGroupSerializer(BaseFHIRSerializer):
 
     fhirConverter = GroupConverterPolicyHolder()
-
-    
