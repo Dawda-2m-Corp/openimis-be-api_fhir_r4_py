@@ -118,6 +118,10 @@ if 'invoice' in imis_modules:
 if 'contribution_plan' in imis_modules:
     router.register(r'InsurancePlanContributionPlanBundle', fhir_viewsets.InsurancePlanContributionViewSet, basename="ContributionPlanBundle_R4")
 
+    router.register(r'PolicyHolderContributionBundle', fhir_viewsets.PolicyHolderContributionBundleViewSet, basename="PolicyHolderContributionBundle_R4")
+
+
+
 urlpatterns = [
     path('', include(router.urls)),
     path('docs/', SpectacularAPIView.as_view(), name='docs'),

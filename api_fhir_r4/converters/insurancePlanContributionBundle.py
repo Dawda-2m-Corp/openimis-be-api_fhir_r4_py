@@ -117,19 +117,51 @@ class InsurancePlanContributionPlanBundleConverter(BaseFHIRConverter, ReferenceC
     @classmethod
     def build_fhir_plan(cls, fhir_contribution_plan_bundle, imis_contribution_plan_bundle_detail, reference_type):
         pass
-        # fhir_contribution_plan_bundle.plan = cls.build_fhir_details(imis_contribution_plan_bundle_detail)
+        fhir_contribution_plan_bundle.plan = cls.build_fhir_details(imis_contribution_plan_bundle_detail)
 
     @classmethod
     def build_fhir_details(cls, imis_contribution_plan_bundle_detail):
         pass
-        # contribution_plan_bundle_details = ContributionPlanBundleDetails.objects.filter(contribution_plan_bundle=imis_contribution_plan_bundle_detail, is_deleted=False)
-        # contribution_plan_bundles = [cls.create_contributional_plan(detail) for detail in contribution_plan_bundle_details]
-        # return contribution_plan_bundles
+        contribution_plan_bundle_details = ContributionPlanBundleDetails.objects.filter(contribution_plan_bundle=imis_contribution_plan_bundle_detail, is_deleted=False)
+        contribution_plan_bundles = [cls.create_contributional_plan(detail) for detail in contribution_plan_bundle_details]
+        return contribution_plan_bundles
 
     @classmethod
     def create_contributional_plan(cls, contribution_plan_bundle_detail):
-        pass
+        plan = InsurancePlanPlan.construct()
     
+        # Create the identifier with the UUID and code
+        identifiers = cls.build_fhir_contributional_plan_identifier(contribution_plan_bundle_detail)
+        plan.identifier = identifiers
+        return plan
+    
+    @classmethod
+    def build_fhir_contributional_plan_identifier(cls, imis_contribution_plan_bundle_detail):
+        identifiers = []
+        cls.build_fhir_uuid_identifier(identifiers, imis_contribution_plan_bundle_detail.contribution_plan)
+        cls.build_fhir_code_identifier(identifiers, imis_contribution_plan_bundle_detail.contribution_plan)
+        cls.add_name_extension_to_identifiers(identifiers, imis_contribution_plan_bundle_detail.contribution_plan)
+        return identifiers
+    
+    @classmethod
+    def add_name_extension_to_identifiers(cls, identifiers, contribution_plan):
+        if hasattr(contribution_plan, 'name') and contribution_plan.name:
+            name_extension = Extension.construct()
+            name_extension.url = "http://example.org/fhir/StructureDefinition/contribution-plan-name"
+            name_extension.valueString = contribution_plan.name
+            for identifier in identifiers:
+                if not cls.has_name_extension(identifier):
+                    if not hasattr(identifier, 'extension') or identifier.extension is None:
+                        identifier.extension = []
+                    identifier.extension.append(name_extension)
+
+    @classmethod
+    def has_name_extension(cls, identifier):
+        if hasattr(identifier, 'extension') and identifier.extension:
+            return any(extension.url == "http://example.org/fhir/StructureDefinition/contribution-plan-name" for extension in identifier.extension)
+        return False
+
+
     @classmethod
     def build_fhir_extensions(cls, fhir_contribution_plan_bundle, imis_contribution_plan_bundle):
         # Implement extensions if needed

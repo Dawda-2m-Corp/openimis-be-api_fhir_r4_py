@@ -32,3 +32,4 @@ from api_fhir_r4.views.fhir.payment_notice import PaymentNoticeViewSet
 from api_fhir_r4.views.fhir.policy_holder_group import GroupViewSet2
 from api_fhir_r4.views.fhir.policy_holder_insuree import PolicyHolderInsureeViewSet
 from api_fhir_r4.views.fhir.insurance_plan_contribution import InsurancePlanContributionViewSet
+from api_fhir_r4.views.fhir.policy_holder_contribution_bundle import PolicyHolderContributionBundleViewSet
