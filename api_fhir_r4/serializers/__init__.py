@@ -109,3 +109,4 @@ from api_fhir_r4.serializers.insuranceOrganisationSerializer import InsuranceOrg
 from api_fhir_r4.serializers.billSerializer import BillSerializer
 from api_fhir_r4.serializers.claimSerializer import ClaimSerializer
 from api_fhir_r4.serializers.policy_holder_group_serializer import PolicyHolderGroupSerializer
+from api_fhir_r4.serializers.insurancePlanContibutionSerializer import InsurancePlanContributionSerializer

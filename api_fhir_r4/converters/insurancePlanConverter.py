@@ -237,6 +237,7 @@ class InsurancePlanConverter(BaseFHIRConverter, ReferenceConverterMixin):
             currency = "EUR"
 
         plan = InsurancePlanPlan.construct()
+        
         # build plan general cost limit slices
         system = f"{GeneralConfiguration.get_system_base_url()}CodeSystem/insurance-plan-general-cost-type"
         plan.generalCost = [
