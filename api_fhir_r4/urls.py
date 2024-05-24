@@ -105,6 +105,7 @@ if 'policy' in imis_modules:
 if 'policyholder' in imis_modules:
     router.register(r'Organization', fhir_viewsets.OrganisationViewSet, basename="Organisation_R4")
     router.register(r'GroupOrganisation', fhir_viewsets.GroupViewSet2, basename="Group")
+    router.register(r'GroupOrganisationContracts', fhir_viewsets.GroupContractsViewset, basename="Group_Contracts")
     router.register(r'OrganizationInsuree', fhir_viewsets.PolicyHolderInsureeViewSet, basename="OrganizationInsuree")
     router.register(r'CodeSystem/organization-ph-legal-form', fhir_viewsets.CodeSystemOrganizationPHLegalFormViewSet,
                     basename="CodeSystem/organization-ph-legal-form_R4")
