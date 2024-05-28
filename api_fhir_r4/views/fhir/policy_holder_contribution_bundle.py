@@ -44,7 +44,7 @@ class PolicyHolderContributionBundleViewSet(BaseFHIRView, MultiIdentifierRetriev
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        identifier = request.query_params.get("identifier")
+        identifier = request.GET.get("identifier")
         if identifier:
             return self.retrieve(request, *args, **kwargs)
         else:
