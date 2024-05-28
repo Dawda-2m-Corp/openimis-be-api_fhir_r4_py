@@ -7,6 +7,7 @@ from policy.apps import PolicyConfig
 from policyholder.apps import PolicyholderConfig
 from product.apps import ProductConfig
 from medical.apps import MedicalConfig
+from contribution_plan.apps import ContributionPlanConfig
 from invoice.apps import InvoiceConfig
 from rest_framework import exceptions
 from rest_framework.permissions import DjangoModelPermissions,BasePermission
@@ -195,6 +196,11 @@ class FHIRApiSubscriptionPermissions(FHIRApiPermissions):
     permissions_patch = R4SubscriptionConfig.get_fhir_sub_update_perms()
     permissions_delete = R4SubscriptionConfig.get_fhir_sub_delete_perms()
 
+
+class FHIRApiContributionPlanBundlePermissions(FHIRApiPermissions):
+
+    permissions_get = ContributionPlanConfig.gql_query_contributionplanbundle_perms
+    permissions_post = ContributionPlanConfig.gql_mutation_create_contributionplanbundle_perms
 class IsPolicyHolderUser(BasePermission):
     """
     Custom permission to only allow policy holder users to access their own organization's insurees.

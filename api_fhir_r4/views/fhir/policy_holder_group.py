@@ -6,7 +6,7 @@ import logging
 from rest_framework.exceptions import PermissionDenied
 from api_fhir_r4.mixins import MultiIdentifierRetrieverMixin, MultiIdentifierUpdateMixin
 from api_fhir_r4.model_retrievers import UUIDIdentifierModelRetriever, GroupIdentifierModelRetriever
-from api_fhir_r4.permissions import FHIRApiGroupPermissions
+from api_fhir_r4.permissions import FHIRApiOrganizationPermissions
 from policyholder.models import PolicyHolder, PolicyHolderUser
 from api_fhir_r4.serializers import PolicyHolderGroupSerializer
 from api_fhir_r4.views.fhir.base import BaseFHIRView
@@ -20,7 +20,9 @@ class GroupViewSet2(BaseFHIRView, MultiIdentifierRetrieverMixin,
                     MultiIdentifierUpdateMixin, viewsets.ModelViewSet):
     retrievers = [UUIDIdentifierModelRetriever, GroupIdentifierModelRetriever]
     serializer_class = PolicyHolderGroupSerializer
-    permission_classes = (FHIRApiGroupPermissions,)
+
+    permission_classes = (FHIRApiOrganizationPermissions,)
+    pagination_class = CustomPropertyPagination
 
     def get_queryset(self):
         try:
