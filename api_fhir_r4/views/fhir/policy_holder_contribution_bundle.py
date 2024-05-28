@@ -7,7 +7,7 @@ from api_fhir_r4.model_retrievers import UUIDIdentifierModelRetriever, CHFIdenti
 from api_fhir_r4.serializers import InsurancePlanContributionSerializer
 from api_fhir_r4.views.fhir.base import BaseFHIRView
 from api_fhir_r4.views.filters import ValidityFromRequestParameterFilter
-from policyholder.models import PolicyHolderUser, PolicyHolderInsuree
+from policyholder.models import PolicyHolderUser, PolicyHolderContributionPlan
 from contribution_plan.models import ContributionPlanBundle
 from api_fhir_r4.permissions import FHIRApiContributionPlanBundlePermissions
 
@@ -20,7 +20,7 @@ class PolicyHolderContributionBundleViewSet(BaseFHIRView, MultiIdentifierRetriev
 
     def get_queryset(self):
         policy_holder_user = self._get_policy_holder_user()
-        contribution_plan_bundle_ids = self._get_policy_holder_insuree_ids(policy_holder_user)
+        contribution_plan_bundle_ids = self._get_policy_holder_contribution_plan_bundle_ids(policy_holder_user)
         queryset = ContributionPlanBundle.objects.filter(pk__in=contribution_plan_bundle_ids)
         return self._filter_queryset(queryset)
 
@@ -31,8 +31,8 @@ class PolicyHolderContributionBundleViewSet(BaseFHIRView, MultiIdentifierRetriev
             raise PermissionDenied("User does not have permission to access this resource.")
         return policy_holder_user
 
-    def _get_policy_holder_insuree_ids(self, policy_holder_user):
-        policy_holder_insurees = PolicyHolderInsuree.objects.filter(
+    def _get_policy_holder_contribution_plan_bundle_ids(self, policy_holder_user):
+        policy_holder_insurees = PolicyHolderContributionPlan.objects.filter(
             policy_holder=policy_holder_user.policy_holder,
             is_deleted=False
         )

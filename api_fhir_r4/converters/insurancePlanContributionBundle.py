@@ -7,6 +7,7 @@ from contribution_plan.models import ContributionPlanBundle, ContributionPlan, C
 from api_fhir_r4.configurations import GeneralConfiguration, R4IdentifierConfig
 from api_fhir_r4.converters import BaseFHIRConverter, ReferenceConverterMixin
 from fhir.resources.R4B.extension import Extension
+from api_fhir_r4.exceptions import FHIRException
 from fhir.resources.R4B.money import Money
 from fhir.resources.R4B.insuranceplan import InsurancePlan, InsurancePlanCoverage, InsurancePlanCoverageBenefit, InsurancePlanCoverageBenefitLimit, InsurancePlanPlan
 from fhir.resources.R4B.period import Period
@@ -30,6 +31,20 @@ class InsurancePlanContributionPlanBundleConverter(BaseFHIRConverter, ReferenceC
         cls.build_fhir_extensions(fhir_contribution_plan_bundle, imis_contribution_plan_bundle)
         cls.check_errors(errors)
         return fhir_contribution_plan_bundle
+    
+    def to_imis_obj(cls, fhir_insurance_plan, audit_user_id):
+        errors = []
+
+        fhir_insurance_plan = InsurancePlan(**fhir_insurance_plan)
+        imis_contibution_plan_bundle = ContributionPlanBundle()
+        imis_contibution_plan_bundle.uuid =  None
+        cls.build_imis_name(imis_contibution_plan_bundle, fhir_insurance_plan)
+        cls.build_imis_identifiers(imis_contibution_plan_bundle, fhir_insurance_plan)
+        cls.build_imis_period(imis_contibution_plan_bundle, fhir_insurance_plan)
+        cls.check_errors(errors)
+        return imis_contibution_plan_bundle
+
+
 
     @classmethod
     def get_reference_obj_id(cls, imis_contribution_plan_bundle ):
@@ -166,3 +181,32 @@ class InsurancePlanContributionPlanBundleConverter(BaseFHIRConverter, ReferenceC
     def build_fhir_extensions(cls, fhir_contribution_plan_bundle, imis_contribution_plan_bundle):
         # Implement extensions if needed
         pass
+
+    @classmethod
+    def build_imis_name(cls, imis_contribution_plan_bundle, fhir_contribution_plan_bundle):
+        if fhir_contribution_plan_bundle.name and fhir_contribution_plan_bundle.name != "":
+            imis_contribution_plan_bundle.name = fhir_contribution_plan_bundle.name
+    
+    @classmethod
+    def build_imis_identifiers(cls, imis_contribution_plan_bundle, fhir_contribution_plan_bundle):
+
+        vlaue = cls.get_fhir_identifier_by_code(fhir_contribution_plan_bundle.identifier,
+                                                R4IdentifierConfig.get_fhir_generic_type_code())
+        cls._validate_fhir_contributional_plan_identifier_code(vlaue)
+        imis_contribution_plan_bundle.code = vlaue
+
+    @classmethod
+    def _validate_fhir_contributional_plan_identifier_code(cls, fhir_insurance_plan_identifier_code):
+        if not fhir_insurance_plan_identifier_code:
+            raise FHIRException(
+                _('InsurancePlan FHIR without code - this field is obligatory')
+            )
+    @classmethod
+    def build_imis_period(cls, imis_contribution_plan_bundle, fhir_contribution_plan_bundle):
+        if fhir_contribution_plan_bundle.period:
+            period = fhir_contribution_plan_bundle.period
+            if period.start:
+                imis_contribution_plan_bundle.date_valid_from = TimeUtils.str_to_date(period.start)
+            if period.end:
+                imis_contribution_plan_bundle.date_valid_to = TimeUtils.str_to_date(period.end)
+    

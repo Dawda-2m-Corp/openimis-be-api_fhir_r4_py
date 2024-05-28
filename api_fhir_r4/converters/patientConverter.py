@@ -320,6 +320,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def build_fhir_addresses(cls, fhir_patient, imis_insuree, reference_type):
+    
         addresses = []
 
         # If family doesn't have location assigned then use family location
