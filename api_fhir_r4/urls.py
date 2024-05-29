@@ -12,15 +12,18 @@ imis_modules = openimis_apps()
 
 router = DefaultRouter()
 router.register(r'login', LoginView, basename="login")
-router.register(r'Subscription', fhir_viewsets.SubscriptionViewSet, basename='Subscription_R4')
+router.register(r'Subscription', fhir_viewsets.SubscriptionViewSet,
+                basename='Subscription_R4')
 
 # register endpoint related to Product module if used
 if 'product' in imis_modules:
-    router.register(r'InsurancePlan', fhir_viewsets.ProductViewSet, basename="InsurancePlan_R4")
+    router.register(r'InsurancePlan', fhir_viewsets.ProductViewSet,
+                    basename="InsurancePlan_R4")
 
 # register endpoint related to Location module if used
 if 'location' in imis_modules:
-    router.register(r'Location', fhir_viewsets.LocationViewSet, basename="Location_R4")
+    router.register(r'Location', fhir_viewsets.LocationViewSet,
+                    basename="Location_R4")
     # code system for openimis organization legal form
     router.register(
         r'CodeSystem/organization-hf-legal-form',
@@ -35,10 +38,8 @@ if 'location' in imis_modules:
 
 # register endpoint for insuree if used
 if 'insuree' in imis_modules:
-    router.register(r'Patient/$',
-                    fhir_viewsets.InsureeViewSet,
+    router.register(r'Patient', fhir_viewsets.InsureeViewSet,
                     basename="Patient_R4")
-    router.register(r'Patient', fhir_viewsets.InsureeViewSet, basename="Patient_R4")
     router.register(r'Group', fhir_viewsets.GroupViewSet, basename="Group_R4")
     router.register(
         r'CoverageEligibilityRequest', fhir_viewsets.CoverageEligibilityRequestViewSet,
@@ -79,15 +80,20 @@ if 'insuree' in imis_modules:
 
 # register endpoints related to medical module
 if 'medical' in imis_modules:
-    router.register(r'Medication', fhir_viewsets.MedicationViewSet, basename="Medication_R4")
-    router.register(r'ActivityDefinition', fhir_viewsets.ActivityDefinitionViewSet, basename="ActivityDefinition_R4")
+    router.register(r'Medication', fhir_viewsets.MedicationViewSet,
+                    basename="Medication_R4")
+    router.register(r'ActivityDefinition', fhir_viewsets.ActivityDefinitionViewSet,
+                    basename="ActivityDefinition_R4")
 
 # register all endpoints related to c based on c
 if 'claim' in imis_modules:
     router.register(r'Claim', fhir_viewsets.ClaimViewSet, basename="Claim_R4")
-    router.register(r'ClaimResponse', fhir_viewsets.ClaimResponseViewSet, basename="ClaimResponse_R4")
-    router.register(r'PractitionerRole', fhir_viewsets.PractitionerRoleViewSet, basename="PractitionerRole_R4")
-    router.register(r'Practitioner', fhir_viewsets.PractitionerViewSet, basename="Practitioner_R4")
+    router.register(
+        r'ClaimResponse', fhir_viewsets.ClaimResponseViewSet, basename="ClaimResponse_R4")
+    router.register(r'PractitionerRole', fhir_viewsets.PractitionerRoleViewSet,
+                    basename="PractitionerRole_R4")
+    router.register(
+        r'Practitioner', fhir_viewsets.PractitionerViewSet, basename="Practitioner_R4")
     router.register(r'CommunicationRequest', fhir_viewsets.CommunicationRequestViewSet,
                     basename="CommunicationRequest_R4")
     router.register(r'Communication', fhir_viewsets.CommunicationViewSet,
@@ -98,35 +104,45 @@ if 'claim' in imis_modules:
 
 # register endpoint for policy if used
 if 'policy' in imis_modules:
-    router.register(r'Coverage', fhir_viewsets.CoverageRequestQuerySet, basename="Coverage_R4")
-    router.register(r'Contract', fhir_viewsets.ContractViewSet, basename="Contract_R4")
+    router.register(
+        r'Coverage', fhir_viewsets.CoverageRequestQuerySet, basename="Coverage_R4")
+    router.register(r'Contract', fhir_viewsets.ContractViewSet,
+                    basename="Contract_R4")
 
 # register endpoint for policy holder if used
 if 'policyholder' in imis_modules:
-    router.register(r'Organization', fhir_viewsets.OrganisationViewSet, basename="Organisation_R4")
-    router.register(r'GroupOrganisation', fhir_viewsets.GroupViewSet2, basename="Group")
-    router.register(r'GroupOrganisationContracts', fhir_viewsets.GroupContractsViewset, basename="Group_Contracts")
-    router.register(r'OrganizationInsuree', fhir_viewsets.PolicyHolderInsureeViewSet, basename="OrganizationInsuree")
+    router.register(
+        r'Organization', fhir_viewsets.OrganisationViewSet, basename="Organisation_R4")
+    router.register(r'GroupOrganisation',
+                    fhir_viewsets.GroupViewSet2, basename="Group")
+    router.register(r'GroupOrganisationContracts',
+                    fhir_viewsets.GroupContractsViewset, basename="Group_Contracts")
+    router.register(r'OrganizationInsuree',
+                    fhir_viewsets.PolicyHolderInsureeViewSet, basename="OrganizationInsuree")
     router.register(r'CodeSystem/organization-ph-legal-form', fhir_viewsets.CodeSystemOrganizationPHLegalFormViewSet,
                     basename="CodeSystem/organization-ph-legal-form_R4")
     router.register(r'CodeSystem/organization-ph-activity', fhir_viewsets.CodeSystemOrganizationPHActivityViewSet,
                     basename="CodeSystem/organization-ph-activity_R4")
 # register endpoint for policy holder if used
 if 'invoice' in imis_modules:
-    router.register(r'Invoice', fhir_viewsets.InvoiceViewSet, basename="Invoice_R4")
-    router.register(r'PaymentNotice', fhir_viewsets.PaymentNoticeViewSet, basename="PaymentNotice_R4")
+    router.register(r'Invoice', fhir_viewsets.InvoiceViewSet,
+                    basename="Invoice_R4")
+    router.register(
+        r'PaymentNotice', fhir_viewsets.PaymentNoticeViewSet, basename="PaymentNotice_R4")
 
 if 'contribution_plan' in imis_modules:
-    router.register(r'InsurancePlanContributionPlanBundle', fhir_viewsets.InsurancePlanContributionViewSet, basename="ContributionPlanBundle_R4")
+    router.register(r'InsurancePlanContributionPlanBundle',
+                    fhir_viewsets.InsurancePlanContributionViewSet, basename="ContributionPlanBundle_R4")
 
-    router.register(r'PolicyHolderContributionBundle', fhir_viewsets.PolicyHolderContributionBundleViewSet, basename="PolicyHolderContributionBundle_R4")
-
+    router.register(r'PolicyHolderContributionBundle', fhir_viewsets.PolicyHolderContributionBundleViewSet,
+                    basename="PolicyHolderContributionBundle_R4")
 
 
 urlpatterns = [
     path('', include(router.urls)),
     path('docs/', SpectacularAPIView.as_view(), name='docs'),
-    path('docs/swagger/', SpectacularSwaggerView.as_view(url_name='docs'), name='swagger-ui'),
+    path('docs/swagger/', SpectacularSwaggerView.as_view(url_name='docs'),
+         name='swagger-ui'),
     path('docs/redoc/', SpectacularRedocView.as_view(url_name='docs'), name='redoc'),
 ]
 
