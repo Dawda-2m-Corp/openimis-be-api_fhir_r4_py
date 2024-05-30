@@ -22,6 +22,7 @@ from contribution.models import Premium
 from api_fhir_r4.utils import DbManagerUtils, TimeUtils
 from policyholder.models import PolicyHolder, PolicyHolderUser, PolicyHolderInsuree
 from rest_framework.exceptions import PermissionDenied
+from core.models import User
 
 
 class PolicyHolderContractConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -194,19 +195,31 @@ class PolicyHolderContractConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_contract_author(cls, fhir_contract, imis_organization, reference_type):
-        policy_holder = imis_organization.policy_holder_id
-        policy_holder_user = PolicyHolderUser.objects.filter(
-            policy_holder=policy_holder, is_deleted=False).first()
+        user_author = imis_organization.user_created
+        user = User.objects.filter(
+            pk=user_author.pk)
 
-        if not policy_holder_user:
+        if not user:
             raise ValueError(
                 "No active PolicyHolderUser found for the given PolicyHolder")
 
         # Build the FHIR resource reference for the author
-        author_ref = cls.build_fhir_resource_reference(
-            policy_holder_user.user, "Practitioner", reference_type=reference_type)
+        author_ref = cls.build_fhir_author_resource_reference(
+            user, "Practitioner", reference_type=reference_type)
 
         fhir_contract.author = author_ref
+
+    @classmethod
+    def build_fhir_author_resource_reference(cls, resource, resource_type, reference_type=None):
+        return {
+            "reference": f"{resource_type}/{resource.i_user.pk}",
+            "display": resource.username,
+            "type": reference_type,
+            "identifier": {
+                "system": cls.get_fhir_code_identifier_type(),
+                "value": str(resource.i_user.uuid)
+            }
+        }
 
     @classmethod
     def build_fhir_resource_reference(cls, resource, resource_type, reference_type=None):
