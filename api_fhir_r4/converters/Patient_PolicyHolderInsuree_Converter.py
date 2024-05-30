@@ -241,6 +241,16 @@ class PatientPolicyHolderInsureeConverter(BaseFHIRConverter, PersonConverterMixi
         if group_extension:
             extensions.append(group_extension)
 
+        chf_id_extension = cls.__build_patient_chf_id_reference_extension(
+            imis_policy_holder_insuree, reference_type)
+        if chf_id_extension:
+            extensions.append(chf_id_extension)
+
+        marital_extension = cls.__build_patient_marital_reference_extension(
+            imis_policy_holder_insuree, reference_type)
+        if marital_extension:
+            extensions.append(marital_extension)
+
         # Add other extensions as needed
         # For example, an extension for an attribute in imis_policy_holder_insuree
         # other_extension = cls.__build_other_extension(imis_policy_holder_insuree)
@@ -248,6 +258,50 @@ class PatientPolicyHolderInsureeConverter(BaseFHIRConverter, PersonConverterMixi
         #     extensions.append(other_extension)
 
         fhir_patient.extension = extensions
+
+    @classmethod
+    def __build_patient_marital_reference_extension(cls, imis_policy_holder_insuree, reference_type):
+
+        extension = Extension.construct()
+        extension.url = f"{GeneralConfiguration.get_system_base_url()}StructureDefinition/chf-if-reference"
+        extension.valueReference = cls.build_fhir_marital_resource_reference(
+            imis_policy_holder_insuree, 'Marital Status', reference_type=reference_type)
+
+        return extension
+
+    @classmethod
+    def build_fhir_marital_resource_reference(cls, resource, resource_type, reference_type=None):
+        return {
+            "reference": f"{resource_type}/{resource.marital}",
+            "display": str(resource.marital),
+            "type": "chf_id_reference",
+            "identifier": {
+                "system": cls.get_fhir_code_identifier_type(),
+                "value": str(resource)
+            }
+        }
+
+    @classmethod
+    def __build_patient_chf_id_reference_extension(cls, imis_policy_holder_insuree, reference_type):
+
+        extension = Extension.construct()
+        extension.url = f"{GeneralConfiguration.get_system_base_url()}StructureDefinition/chf-if-reference"
+        extension.valueReference = cls.build_fhir_chfid_resource_reference(
+            imis_policy_holder_insuree, 'CHF_ID', reference_type=reference_type)
+
+        return extension
+
+    @classmethod
+    def build_fhir_chfid_resource_reference(cls, resource, resource_type, reference_type=None):
+        return {
+            "reference": f"{resource_type}/{resource.chf_id}",
+            "display": str(resource.chf_id),
+            "type": "chf_id_reference",
+            "identifier": {
+                "system": cls.get_fhir_code_identifier_type(),
+                "value": str(resource)
+            }
+        }
 
     @classmethod
     def __build_patient_group_reference_extension(cls, imis_policy_holder_insuree, reference_type):
