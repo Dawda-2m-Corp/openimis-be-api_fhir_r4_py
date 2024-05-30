@@ -4,7 +4,6 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from rest_framework.routers import DefaultRouter
 from openIMIS.openimisapps import openimis_apps
-from api_fhir_r4.views.fhir.policy_holder_group import AddContractToOrganization
 
 from api_fhir_r4.views import LoginView, fhir as fhir_viewsets
 
@@ -141,7 +140,7 @@ if 'contribution_plan' in imis_modules:
 urlpatterns = [
     path('', include(router.urls)),
     path('GroupOrganisationContracts/addContract',
-         AddContractToOrganization, name="add_contract"),
+         fhir_viewsets.AddContractToOrganization, name="add_contract"),
     path('docs/', SpectacularAPIView.as_view(), name='docs'),
     path('docs/swagger/', SpectacularSwaggerView.as_view(url_name='docs'),
          name='swagger-ui'),
