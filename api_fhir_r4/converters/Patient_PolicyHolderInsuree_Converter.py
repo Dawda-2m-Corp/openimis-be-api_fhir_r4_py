@@ -36,10 +36,22 @@ class PatientPolicyHolderInsureeConverter(BaseFHIRConverter, PersonConverterMixi
             fhir_patient, imis_policy_holder_insuree, reference_type)
         cls.build_fhir_marital_status(fhir_patient, imis_policy_holder_insuree)
         cls.build_fhir_gender(fhir_patient, imis_policy_holder_insuree)
+        cls.build_fhir_birth_date(fhir_patient, imis_policy_holder_insuree)
         cls.build_fhir_addresses(
             fhir_patient, imis_policy_holder_insuree, reference_type)
         cls.build_fhir_photo(fhir_patient, imis_policy_holder_insuree)
         return fhir_patient
+
+    @classmethod
+    def build_fhir_birth_date(cls, fhir_patient, imis_policy_holder_insuree):
+        from core import datetime
+        # check if datetime object
+        if isinstance(imis_policy_holder_insuree.dob, datetime.datetime):
+            fhir_patient.birthDate = str(
+                imis_policy_holder_insuree.dob.date().isoformat())
+        else:
+            fhir_patient.birthDate = str(
+                imis_policy_holder_insuree.dob.isoformat())
 
     @classmethod
     def build_fhir_photo(cls, fhir_patient, imis_policy_holder_insuree):
@@ -48,7 +60,7 @@ class PatientPolicyHolderInsureeConverter(BaseFHIRConverter, PersonConverterMixi
             # If URL root is not explicitly given in the settings 'localhost' is used
             # (if value is empty validation exception is raised).
             abs_url = GeneralConfiguration.get_host_domain().split(
-                'http://')[1] or 'localhost'
+                'http://')[1] or 'localhost:8000'
             domain = abs_url
             photo_uri = cls.__build_photo_uri(imis_policy_holder_insuree)
             photo = Attachment.construct()
@@ -68,7 +80,7 @@ class PatientPolicyHolderInsureeConverter(BaseFHIRConverter, PersonConverterMixi
     def __build_photo_uri(cls, imis_policy_holder_insuree):
         photo_folder = imis_policy_holder_insuree.photo.folder.replace(
             "\\", "/")
-        photo_full_path = F"{photo_folder}/{imis_policy_holder_insuree.photo.filename}"
+        photo_full_path = F"{photo_folder}{imis_policy_holder_insuree.photo.filename}"
         path = f'/photo/{photo_full_path}'
         return path
 
